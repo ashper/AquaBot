@@ -110,7 +110,14 @@ namespace AquaBot
         {
             ImageInfo result = await si.SearchRandom(new SearchOption(tags));
             await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, posting image {result.SampleUrl}"));
-            await message.Channel.SendMessageAsync(result.SampleUrl);
+            if (result == null || string.IsNullOrWhiteSpace(result.SampleUrl))
+            {
+                await message.Channel.SendMessageAsync(CurrentAvatar.NothingFound);
+            }
+            else
+            {
+                await message.Channel.SendMessageAsync(result.SampleUrl);
+            }
         }
 
         private async Task PostCustomSafebooruAsync(SocketMessage message)

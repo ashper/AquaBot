@@ -10,5 +10,6 @@
         string AlreadyHere { get; }
         string ChangeUnknown { get; }
         string DiscordWontLetMe { get; }
+        string NothingFound { get; }
     }
 }

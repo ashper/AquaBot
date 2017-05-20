@@ -1,4 +1,6 @@
-﻿namespace AquaBot
+﻿using System;
+
+namespace AquaBot
 {
     internal class Darkness : IBotAvatar
     {
@@ -17,5 +19,7 @@
         public string ChangeUnknown => "I don't know this person master";
 
         public string DiscordWontLetMe => "Discord has stopped me master";
+
+        public string NothingFound => "Nothing found, I failed you master, please punish me";
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace AquaBot
+﻿using System;
+
+namespace AquaBot
 {
     public class Megumin : IBotAvatar
     {
@@ -17,5 +19,7 @@
         public string ChangeUnknown => "Errrrrr, who?";
 
         public string DiscordWontLetMe => "Discord said no...";
+
+        public string NothingFound => "I couldn't find anything, woops";
     }
 }

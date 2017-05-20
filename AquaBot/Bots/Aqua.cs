@@ -19,5 +19,7 @@ namespace AquaBot
         public string ChangeUnknown => "Who?!";
 
         public string DiscordWontLetMe => "Discord is a big meanie and stopped me";
+
+        public string NothingFound => "Hahahaha nothing found, loser";
     }
 }

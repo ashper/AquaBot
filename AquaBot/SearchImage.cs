@@ -36,6 +36,11 @@ namespace AquaBot
 
             int postCount = this.ParsePostCount(body);
 
+            if (postCount == 0)
+            {
+                return new ImageInfo();
+            }
+
             Random postPicker = new Random();
             var chosenPost = postPicker.Next(0, postCount - 1);
 
