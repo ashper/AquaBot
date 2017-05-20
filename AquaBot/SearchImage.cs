@@ -8,20 +8,12 @@ namespace AquaBot
 {
     public abstract class SearchImage
     {
-        public abstract int EngineID { get; }
-
         public async Task<IList<ImageInfo>> Search(SearchOption option)
         {
             Uri uriRequest = this.RequestURL(option);
-            byte[] uriBody = this.RequestBody(option);
 
             HttpWebRequest wReq = WebRequest.Create(this.RequestURL(option)) as HttpWebRequest;
-            wReq.Method = (uriBody != null) ? "POST" : "GET";
-            if (uriBody != null)
-            {
-                wReq.ContentType = "application/x-www-form-urlencoded";
-                (await wReq.GetRequestStreamAsync()).Write(uriBody, 0, uriBody.Length);
-            }
+            wReq.Method = "GET";
 
             HttpWebResponse wRes = await wReq.GetResponseAsync() as HttpWebResponse;
 
@@ -34,15 +26,9 @@ namespace AquaBot
         {
             option.Limit = 1;
             Uri uriRequest = this.RequestURL(option);
-            byte[] uriBody = this.RequestBody(option);
 
             HttpWebRequest wReq = WebRequest.Create(this.RequestURL(option)) as HttpWebRequest;
-            wReq.Method = (uriBody != null) ? "POST" : "GET";
-            if (uriBody != null)
-            {
-                wReq.ContentType = "application/x-www-form-urlencoded";
-                (await wReq.GetRequestStreamAsync()).Write(uriBody, 0, uriBody.Length);
-            }
+            wReq.Method = "GET";
 
             HttpWebResponse wRes = await wReq.GetResponseAsync() as HttpWebResponse;
 
@@ -56,12 +42,6 @@ namespace AquaBot
             option.Page = chosenPost;
 
             wReq = WebRequest.Create(this.RequestURL(option)) as HttpWebRequest;
-            wReq.Method = (uriBody != null) ? "POST" : "GET";
-            if (uriBody != null)
-            {
-                wReq.ContentType = "application/x-www-form-urlencoded";
-                (await wReq.GetRequestStreamAsync()).Write(uriBody, 0, uriBody.Length);
-            }
 
             wRes = await wReq.GetResponseAsync() as HttpWebResponse;
 
@@ -71,8 +51,6 @@ namespace AquaBot
         }
 
         internal abstract Uri RequestURL(SearchOption option);
-
-        internal abstract byte[] RequestBody(SearchOption option);
 
         internal abstract IList<ImageInfo> ParseData(string body, SearchOption option);
 
