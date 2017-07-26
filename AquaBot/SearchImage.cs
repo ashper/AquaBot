@@ -40,6 +40,10 @@ namespace AquaBot
             {
                 return new ImageInfo();
             }
+            else if (postCount > 100)
+            {
+                postCount = 100;
+            }
 
             Random postPicker = new Random();
             var chosenPost = postPicker.Next(0, postCount - 1);

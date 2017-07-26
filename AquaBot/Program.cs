@@ -30,8 +30,8 @@ namespace AquaBot
             Client.Log += Log;
             Client.MessageReceived += MessageReceived;
 
-            //  var testingToken = "MzI3ODgyNDU5MjEzNzI1Njk4.DFoeSg.NpS9OUJPeA32NUwHAGgP9_qGipg";
-            string token = "MzE1MDcxMjUxMDMzMDk2MTk0.DFqFTw.xILmbk3dEdvw-0wJVUvFH4WphTQ"; // Remember to keep this private!
+           //   var token = "MzI3ODgyNDU5MjEzNzI1Njk4.DFoeSg.NpS9OUJPeA32NUwHAGgP9_qGipg"; // testing Token
+           string token = "MzE1MDcxMjUxMDMzMDk2MTk0.DFqFTw.xILmbk3dEdvw-0wJVUvFH4WphTQ"; // Remember to keep this private!
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
 
@@ -119,7 +119,7 @@ namespace AquaBot
                 return;
             }
 
-            var tags = message.Content.ToLower().Replace("!gelbooru", "").Trim();
+            var tags = $"{message.Content.ToLower().Replace("!gelbooru", "").Trim()} sort:score:desc";
             await PostImageSearchAsync(message, tags, gb);
         }
 
