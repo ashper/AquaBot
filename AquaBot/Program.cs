@@ -9,7 +9,9 @@ namespace AquaBot
 {
     public class Program
     {
-        private static Safebooru si = new Safebooru();
+        // TODO: A lot of refactoring needed, maybe the boorus should be an interface?
+        private static Safebooru sb = new Safebooru();
+
         private static Gelbooru gb = new Gelbooru();
         private DiscordSocketClient Client;
         private const string SettingFileName = "settings.json";
@@ -23,12 +25,13 @@ namespace AquaBot
         public async Task MainAsync()
         {
             Client = new DiscordSocketClient();
-            LoadSettings();
+            //LoadSettings();
 
             Client.Log += Log;
             Client.MessageReceived += MessageReceived;
 
-            string token = "MzI3ODgyNDU5MjEzNzI1Njk4.DFoeSg.NpS9OUJPeA32NUwHAGgP9_qGipg"; // Remember to keep this private!
+            //  var testingToken = "MzI3ODgyNDU5MjEzNzI1Njk4.DFoeSg.NpS9OUJPeA32NUwHAGgP9_qGipg";
+            string token = "MzE1MDcxMjUxMDMzMDk2MTk0.DFqFTw.xILmbk3dEdvw-0wJVUvFH4WphTQ"; // Remember to keep this private!
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
 
@@ -45,12 +48,10 @@ namespace AquaBot
                     JsonSerializer se = new JsonSerializer();
                     JsonTextReader reader = new JsonTextReader(re);
                     CurrentSettings = se.Deserialize<BotSettings>(reader);
-                  
                 }
             }
             else
             {
-              
             }
         }
 
@@ -63,34 +64,42 @@ namespace AquaBot
             }
         }
 
+        // TODO - This feels wrong being in here
         private async Task MessageReceived(SocketMessage message)
         {
             if (message.Content.ToLower() == "!aqua")
             {
-                await PostSafebooruAsync(message, "aqua_(konosuba) 1girl");
+                await PostImageSearchAsync(message, "aqua_(konosuba) 1girl", sb);
             }
             else if (message.Content.ToLower() == "!megumin")
             {
-                await PostSafebooruAsync(message, "megumin 1girl");
+                await PostImageSearchAsync(message, "megumin 1girl", sb);
             }
             else if (message.Content.ToLower() == "!darkness")
             {
-                await PostSafebooruAsync(message, "darkness_(konosuba) 1girl");
+                await PostImageSearchAsync(message, "darkness_(konosuba) 1girl", sb);
             }
             else if (message.Content.ToLower() == "!konosuba")
             {
-                await PostSafebooruAsync(message, "kono_subarashii_sekai_ni_shukufuku_wo! -1girl -1boy");
+                await PostImageSearchAsync(message, "kono_subarashii_sekai_ni_shukufuku_wo! -1girl -1boy", sb);
             }
-            else if (message.Content.ToLower().IndexOf("!konocustom") >= 0)
+            else if (message.Content.ToLower().IndexOf("!safebooru") >= 0)
             {
-                await PostCustomSafebooruAsync(message);
+                await PostSafebooruAsync(message);
             }
-
+            else if (message.Content.ToLower().IndexOf("!gelbooru") >= 0)
+            {
+                await PostGelbooruAsync(message);
+            }
+            else if (message.Content.ToLower() == "!bugmatty")
+            {
+                await BugMatty(message);
+            }
         }
 
-        private async Task PostSafebooruAsync(SocketMessage message, string tags)
+        private async Task PostImageSearchAsync(SocketMessage message, string tags, SearchImage searchingEngine)
         {
-            ImageInfo result = await gb.SearchRandom(new SearchOption(tags));
+            ImageInfo result = await searchingEngine.SearchRandom(new SearchOption(tags));
             await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, posting image {result.SampleUrl}"));
             if (result == null || string.IsNullOrWhiteSpace(result.SampleUrl))
             {
@@ -102,10 +111,36 @@ namespace AquaBot
             }
         }
 
-        private async Task PostCustomSafebooruAsync(SocketMessage message)
+        private async Task PostGelbooruAsync(SocketMessage message)
         {
-            var tags = message.Content.ToLower().Replace("!konocustom", "").Trim();
-            await PostSafebooruAsync(message, tags);
+            if (CheckNFSWChannel(message) == false)
+            {
+                await message.Channel.SendMessageAsync("Baka! Hentai! This channel isn't NSFW");
+                return;
+            }
+
+            var tags = message.Content.ToLower().Replace("!gelbooru", "").Trim();
+            await PostImageSearchAsync(message, tags, gb);
+        }
+
+        private async Task PostSafebooruAsync(SocketMessage message)
+        {
+            var tags = message.Content.ToLower().Replace("!safebooru", "").Trim();
+            await PostImageSearchAsync(message, tags, sb);
+        }
+
+        private async Task BugMatty(SocketMessage message)
+        {
+            var user = Client.GetUser(108696446991085568);
+            if (user != null)
+            {
+                await message.Channel.SendMessageAsync($"{ user.Mention } stupid");
+            }
+        }
+
+        private bool CheckNFSWChannel(SocketMessage message)
+        {
+            return message.Channel.IsNsfw;
         }
 
         private Task Log(LogMessage msg)
