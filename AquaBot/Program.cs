@@ -98,6 +98,24 @@ namespace AquaBot
             else if (message.Content.ToLower().IndexOf("!roll") >= 0)
             {
                 await RollDX(message);
+            } else if(message.Content.ToLower() == "!flip")
+            {
+                await FilpHeadsTails(message);
+            }
+        }
+
+        private async Task FilpHeadsTails(SocketMessage message)
+        {
+            var rnd = new Random();
+            var headsOrTails = rnd.Next(2);
+
+            if (headsOrTails == 0)
+            {
+                await message.Channel.SendMessageAsync("True");
+            }
+            else if (headsOrTails == 1)
+            {
+                await message.Channel.SendMessageAsync("False");
             }
         }
 
