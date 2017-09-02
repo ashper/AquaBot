@@ -30,8 +30,8 @@ namespace AquaBot
             Client.Log += Log;
             Client.MessageReceived += MessageReceived;
 
-           //   var token = "MzI3ODgyNDU5MjEzNzI1Njk4.DFoeSg.NpS9OUJPeA32NUwHAGgP9_qGipg"; // testing Token
-           string token = "MzE1MDcxMjUxMDMzMDk2MTk0.DFqFTw.xILmbk3dEdvw-0wJVUvFH4WphTQ"; // Remember to keep this private!
+            //   var token = "MzI3ODgyNDU5MjEzNzI1Njk4.DFoeSg.NpS9OUJPeA32NUwHAGgP9_qGipg"; // testing Token
+            string token = "MzE1MDcxMjUxMDMzMDk2MTk0.DFqFTw.xILmbk3dEdvw-0wJVUvFH4WphTQ"; // Remember to keep this private!
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
 
@@ -94,6 +94,25 @@ namespace AquaBot
             else if (message.Content.ToLower() == "!bugmatty")
             {
                 await BugMatty(message);
+            }
+            else if (message.Content.ToLower().IndexOf("!roll") >= 0)
+            {
+                await RollDX(message);
+            }
+        }
+
+        private async Task RollDX(SocketMessage message)
+        {
+            int maxRoll = 0;
+            if (Int32.TryParse(message.Content.ToLower().Replace("!roll", "").Trim(), out maxRoll))
+            {
+                var rnd = new Random();
+                var randomRoll = rnd.Next(1, maxRoll);
+                await message.Channel.SendMessageAsync(randomRoll.ToString());
+            }
+            else
+            {
+                await message.Channel.SendMessageAsync("You didn't do it right dummy!");
             }
         }
 
