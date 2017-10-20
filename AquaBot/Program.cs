@@ -30,8 +30,8 @@ namespace AquaBot
             Client.Log += Log;
             Client.MessageReceived += MessageReceived;
 
-            //   var token = "MzI3ODgyNDU5MjEzNzI1Njk4.DFoeSg.NpS9OUJPeA32NUwHAGgP9_qGipg"; // testing Token
-            string token = "MzE1MDcxMjUxMDMzMDk2MTk0.DFqFTw.xILmbk3dEdvw-0wJVUvFH4WphTQ"; // Remember to keep this private!
+            var token = "MzEyOTI2NDM3MDk3MDc4Nzg1.DMvM1A.lYcl4RxYtL2Deawle1UIi2kkUTQ"; 
+          //  string token = "MzE1MDcxMjUxMDMzMDk2MTk0.DFqFTw.xILmbk3dEdvw-0wJVUvFH4WphTQ"; // testing token
             await Client.LoginAsync(TokenType.Bot, token);
             await Client.StartAsync();
 
