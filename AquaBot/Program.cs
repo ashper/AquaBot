@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace AquaBot
@@ -10,12 +8,12 @@ namespace AquaBot
     public class Program
     {
         // TODO: A lot of refactoring needed, maybe the boorus should be an interface?
+        // TODO: This is a mess >.>
         private static Safebooru sb = new Safebooru();
-
         private static Gelbooru gb = new Gelbooru();
         private DiscordSocketClient Client;
-        private const string SettingFileName = "settings.json";
-        private BotSettings CurrentSettings;
+
+        private Settings Settings;
 
         public static void Main(string[] args)
         {
@@ -25,46 +23,20 @@ namespace AquaBot
         public async Task MainAsync()
         {
             Client = new DiscordSocketClient();
-            //LoadSettings();
+            Settings = new Settings();
+            Settings.LoadSettings();
 
             Client.Log += Log;
             Client.MessageReceived += MessageReceived;
 
-            var token = "MzEyOTI2NDM3MDk3MDc4Nzg1.DMvM1A.lYcl4RxYtL2Deawle1UIi2kkUTQ"; 
-          //  string token = "MzE1MDcxMjUxMDMzMDk2MTk0.DFqFTw.xILmbk3dEdvw-0wJVUvFH4WphTQ"; // testing token
-            await Client.LoginAsync(TokenType.Bot, token);
+            await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.TestingToken);
             await Client.StartAsync();
 
             // Block this task until the program is closed.
             await Task.Delay(-1);
         }
 
-        private void LoadSettings()
-        {
-            if (File.Exists(SettingFileName))
-            {
-                using (StreamReader re = File.OpenText(SettingFileName))
-                {
-                    JsonSerializer se = new JsonSerializer();
-                    JsonTextReader reader = new JsonTextReader(re);
-                    CurrentSettings = se.Deserialize<BotSettings>(reader);
-                }
-            }
-            else
-            {
-            }
-        }
-
-        private void SaveSettings()
-        {
-            using (StreamWriter file = File.CreateText(SettingFileName))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, CurrentSettings);
-            }
-        }
-
-        // TODO - This feels wrong being in here
+        // TODO - This feels wrong being in here? Maybe some better way to handle a large if like this?
         private async Task MessageReceived(SocketMessage message)
         {
             if (message.Content.ToLower() == "!aqua")
@@ -98,9 +70,17 @@ namespace AquaBot
             else if (message.Content.ToLower().IndexOf("!roll") >= 0)
             {
                 await RollDX(message);
-            } else if(message.Content.ToLower() == "!flip")
+            }
+            else if (message.Content.ToLower() == "!flip")
             {
                 await FilpHeadsTails(message);
+            }
+            else if (message.Content.ToLower().Replace(" ", "") == "kampai")
+            {
+                await RandomImageHandler.AquaKampai(message);
+            } else if (message.Content.ToLower().IndexOf("aqua") >= 0)
+            {
+                await AquaAbuseHandler.HandlePotentialAbuse(message);
             }
         }
 
