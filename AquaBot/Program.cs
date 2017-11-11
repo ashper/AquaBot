@@ -10,6 +10,7 @@ namespace AquaBot
         // TODO: A lot of refactoring needed, maybe the boorus should be an interface?
         // TODO: This is a mess >.>
         private static Safebooru sb = new Safebooru();
+
         private static Gelbooru gb = new Gelbooru();
         private DiscordSocketClient Client;
 
@@ -39,49 +40,68 @@ namespace AquaBot
         // TODO - This feels wrong being in here? Maybe some better way to handle a large if like this?
         private async Task MessageReceived(SocketMessage message)
         {
-            if (message.Content.ToLower() == "!aqua")
+            if (message.Author.Id == 267118970094485505 && message.Content == "nice")
             {
-                await PostImageSearchAsync(message, "aqua_(konosuba) 1girl", sb);
+                await HandleYuudachiNice(message);
             }
-            else if (message.Content.ToLower() == "!megumin")
+            else if (message.Source != MessageSource.Bot)
             {
-                await PostImageSearchAsync(message, "megumin 1girl", sb);
+                if (message.Content.ToLower() == "!aqua")
+                {
+                    await PostImageSearchAsync(message, "aqua_(konosuba) 1girl", sb);
+                }
+                else if (message.Content.ToLower() == "!megumin")
+                {
+                    await PostImageSearchAsync(message, "megumin 1girl", sb);
+                }
+                else if (message.Content.ToLower() == "!darkness")
+                {
+                    await PostImageSearchAsync(message, "darkness_(konosuba) 1girl", sb);
+                }
+                else if (message.Content.ToLower() == "!konosuba")
+                {
+                    await PostImageSearchAsync(message, "kono_subarashii_sekai_ni_shukufuku_wo! -1girl -1boy", sb);
+                }
+                else if (message.Content.ToLower().IndexOf("!safebooru") >= 0)
+                {
+                    await PostSafebooruAsync(message);
+                }
+                else if (message.Content.ToLower().IndexOf("!gelbooru") >= 0)
+                {
+                    await PostGelbooruAsync(message);
+                }
+                else if (message.Content.ToLower() == "!bugmatty")
+                {
+                    await BugMatty(message);
+                }
+                else if (message.Content.ToLower().IndexOf("!roll") >= 0)
+                {
+                    await RollDX(message);
+                }
+                else if (message.Content.ToLower() == "!flip")
+                {
+                    await FilpHeadsTails(message);
+                }
+                else if (message.Content.ToLower().Replace(" ", "").IndexOf("kampai") >= 0 && message.Content.Length <= 20)
+                {
+                    await RandomImageHandler.AquaKampai(message);
+                }
+                else if (message.Content.ToLower().IndexOf("aqua") >= 0)
+                {
+                    await AquaAbuseHandler.HandlePotentialAbuse(message);
+                }
             }
-            else if (message.Content.ToLower() == "!darkness")
+        }
+
+        private async Task HandleYuudachiNice(SocketMessage message)
+        {
+            await Task.Run(async () =>
             {
-                await PostImageSearchAsync(message, "darkness_(konosuba) 1girl", sb);
-            }
-            else if (message.Content.ToLower() == "!konosuba")
-            {
-                await PostImageSearchAsync(message, "kono_subarashii_sekai_ni_shukufuku_wo! -1girl -1boy", sb);
-            }
-            else if (message.Content.ToLower().IndexOf("!safebooru") >= 0)
-            {
-                await PostSafebooruAsync(message);
-            }
-            else if (message.Content.ToLower().IndexOf("!gelbooru") >= 0)
-            {
-                await PostGelbooruAsync(message);
-            }
-            else if (message.Content.ToLower() == "!bugmatty")
-            {
-                await BugMatty(message);
-            }
-            else if (message.Content.ToLower().IndexOf("!roll") >= 0)
-            {
-                await RollDX(message);
-            }
-            else if (message.Content.ToLower() == "!flip")
-            {
-                await FilpHeadsTails(message);
-            }
-            else if (message.Content.ToLower().Replace(" ", "") == "kampai")
-            {
-                await RandomImageHandler.AquaKampai(message);
-            } else if (message.Content.ToLower().IndexOf("aqua") >= 0)
-            {
-                await AquaAbuseHandler.HandlePotentialAbuse(message);
-            }
+                var sentMessage = await message.Channel.SendMessageAsync(":amusedaqua: This is Aqua's server, bad Yuudachi ");
+                await Task.Delay(5000);
+                await message.DeleteAsync();
+                await sentMessage.DeleteAsync();
+            });
         }
 
         private async Task FilpHeadsTails(SocketMessage message)

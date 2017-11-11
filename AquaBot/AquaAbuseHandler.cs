@@ -17,6 +17,7 @@ namespace AquaBot
             "uselessgoddess",
             "trash",
             "ashit",
+            "thot",
         };
 
         // At this point we know the message contains the text Aqua, lets see if we can find any other text from our abuse list
@@ -24,7 +25,7 @@ namespace AquaBot
         {
             foreach(var abuse in AbuseTerms)
             {
-                if(message.Content.IndexOf(abuse) >= 0)
+                if(message.Content.ToLower().Replace(" ", "").IndexOf(abuse) >= 0)
                 {
                     await RandomImageHandler.AquaAbuse(message);
                     break;
