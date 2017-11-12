@@ -97,7 +97,7 @@ namespace AquaBot
         {
             await Task.Run(async () =>
             {
-                var sentMessage = await message.Channel.SendMessageAsync(":amusedaqua: This is Aqua's server, bad Yuudachi ");
+                var sentMessage = await message.Channel.SendMessageAsync("<:amusedaqua:281585444335124493> This is Aqua's server, bad Yuudachi ");
                 await Task.Delay(5000);
                 await message.DeleteAsync();
                 await sentMessage.DeleteAsync();

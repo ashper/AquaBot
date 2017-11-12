@@ -19,6 +19,9 @@
     <None Update="Images\Abuses\1.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Images\Abuses\2.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Images\Abuses\2.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
