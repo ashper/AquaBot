@@ -12,6 +12,7 @@ namespace AquaBot
         private static Safebooru sb = new Safebooru();
 
         private static Gelbooru gb = new Gelbooru();
+        private static WikipediaClient wiki = new WikipediaClient();
         private DiscordSocketClient Client;
 
         private Settings Settings;
@@ -29,12 +30,29 @@ namespace AquaBot
 
             Client.Log += Log;
             Client.MessageReceived += MessageReceived;
+            Client.Disconnected += Client_Disconnected;
 
             await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.TestingToken);
             await Client.StartAsync();
 
             // Block this task until the program is closed.
             await Task.Delay(-1);
+        }
+
+        private async Task Client_Disconnected(Exception arg)
+        {
+            var connectionSorted = false;
+            while (connectionSorted == false)
+            {
+                await Task.Delay(5000);
+                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
+                await Client.StartAsync();
+                await Task.Delay(5000);
+                if (Client.ConnectionState == ConnectionState.Connected)
+                {
+                    connectionSorted = true;
+                }
+            }
         }
 
         // TODO - This feels wrong being in here? Maybe some better way to handle a large if like this?
@@ -90,6 +108,28 @@ namespace AquaBot
                 {
                     await AquaAbuseHandler.HandlePotentialAbuse(message);
                 }
+                else if (message.Content.ToLower().IndexOf("!wiki") == 0)
+                {
+                    await WikiSearch(message);
+                }
+            }
+        }
+
+        private async Task WikiSearch(SocketMessage message)
+        {
+            var searchTerm = message.Content.Substring(5).Trim();
+            var pageUrl = await wiki.SearchForPage(searchTerm);
+            if (pageUrl == "")
+            {
+                await message.Channel.SendMessageAsync("Nothing found.");
+            }
+            else if (pageUrl == "BROKE")
+            {
+                await message.Channel.SendMessageAsync("Wikipedia search broke :joy:");
+            }
+            else
+            {
+                await message.Channel.SendMessageAsync(pageUrl);
             }
         }
 
