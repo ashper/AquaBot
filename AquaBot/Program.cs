@@ -32,7 +32,7 @@ namespace AquaBot
             Client.MessageReceived += MessageReceived;
             Client.Disconnected += Client_Disconnected;
 
-            await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.TestingToken);
+            await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
             await Client.StartAsync();
 
             // Block this task until the program is closed.
