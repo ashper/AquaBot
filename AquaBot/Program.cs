@@ -34,24 +34,20 @@ namespace AquaBot
 
             await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
             await Client.StartAsync();
-
-            // Block this task until the program is closed.
             await Task.Delay(-1);
         }
 
         private async Task Client_Disconnected(Exception arg)
         {
-            var connectionSorted = false;
-            while (connectionSorted == false)
+            while (Client.ConnectionState != ConnectionState.Connected)
             {
                 await Task.Delay(5000);
-                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
-                await Client.StartAsync();
-                await Task.Delay(5000);
-                if (Client.ConnectionState == ConnectionState.Connected)
+                if (Client.ConnectionState == ConnectionState.Disconnected)
                 {
-                    connectionSorted = true;
+                    await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
+                    await Client.StartAsync();
                 }
+                await Task.Delay(5000);
             }
         }
 

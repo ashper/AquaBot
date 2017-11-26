@@ -1,2 +1,3 @@
-dotnet build AquaBot.csproj
-dotnet publish AquaBot.csproj -c Release --self-contained -r win10-x64
+dotnet clean
+dotnet build -c release
+dotnet publish -c release -r win7-x64 -o Publish/win7-x64
