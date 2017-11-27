@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AquaBot
@@ -17,6 +18,10 @@ namespace AquaBot
 
         private Settings Settings;
 
+        private Timer tm = null;
+
+        private AutoResetEvent autoEvent = null;
+
         public static void Main(string[] args)
         {
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -24,31 +29,38 @@ namespace AquaBot
 
         public async Task MainAsync()
         {
-            Client = new DiscordSocketClient();
             Settings = new Settings();
             Settings.LoadSettings();
 
-            Client.Log += Log;
-            Client.MessageReceived += MessageReceived;
-            Client.Disconnected += Client_Disconnected;
+            autoEvent = new AutoResetEvent(false);
+            tm = new Timer(Execute, autoEvent, 0, 10000);
 
-            await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
-            await Client.StartAsync();
             await Task.Delay(-1);
         }
 
-        private async Task Client_Disconnected(Exception arg)
+        public async void Execute(Object stateInfo)
         {
-            while (Client.ConnectionState != ConnectionState.Connected)
+            if (Client == null || Client.ConnectionState == ConnectionState.Disconnected)
             {
-                await Task.Delay(5000);
-                if (Client.ConnectionState == ConnectionState.Disconnected)
-                {
-                    await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
-                    await Client.StartAsync();
-                }
-                await Task.Delay(5000);
+                await NewAquaBot();
             }
+        }
+
+        public async Task NewAquaBot()
+        {
+            if (Client != null)
+            {
+                await Client.StopAsync();
+                Client.Dispose();
+                Client = null;
+            }
+
+            Client = new DiscordSocketClient();
+            Client.Log += Log;
+            Client.MessageReceived += MessageReceived;
+
+            await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
+            await Client.StartAsync();
         }
 
         // TODO - This feels wrong being in here? Maybe some better way to handle a large if like this?
