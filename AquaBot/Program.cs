@@ -40,27 +40,41 @@ namespace AquaBot
 
         public async void Execute(Object stateInfo)
         {
-            if (Client == null || Client.ConnectionState == ConnectionState.Disconnected)
+            try
             {
-                await NewAquaBot();
+                if (Client == null || Client.ConnectionState == ConnectionState.Disconnected)
+                {
+                    await NewAquaBot();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error detected {e.Message} - { e.StackTrace }");
             }
         }
 
         public async Task NewAquaBot()
         {
-            if (Client != null)
+            try
             {
-                await Client.StopAsync();
-                Client.Dispose();
-                Client = null;
+                if (Client != null)
+                {
+                    await Client.StopAsync();
+                    Client.Dispose();
+                    Client = null;
+                }
+
+                Client = new DiscordSocketClient();
+                Client.Log += Log;
+                Client.MessageReceived += MessageReceived;
+
+                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
+                await Client.StartAsync();
             }
-
-            Client = new DiscordSocketClient();
-            Client.Log += Log;
-            Client.MessageReceived += MessageReceived;
-
-            await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
-            await Client.StartAsync();
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error detected {e.Message} - { e.StackTrace }");
+            }
         }
 
         // TODO - This feels wrong being in here? Maybe some better way to handle a large if like this?
