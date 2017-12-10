@@ -33,7 +33,7 @@ namespace AquaBot
             Settings.LoadSettings();
 
             autoEvent = new AutoResetEvent(false);
-            tm = new Timer(Execute, autoEvent, 0, 10000);
+            tm = new Timer(Execute, autoEvent, 0, 600000);
 
             await Task.Delay(-1);
         }
@@ -42,14 +42,14 @@ namespace AquaBot
         {
             try
             {
-                if (Client == null || Client.ConnectionState == ConnectionState.Disconnected)
+                if (Client == null || Client.ConnectionState != ConnectionState.Connected)
                 {
                     await NewAquaBot();
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error detected {e.Message} - { e.StackTrace }");
+                Console.WriteLine($"Error detected in Execute Method {e.Message} - { e.StackTrace }");
             }
         }
 
@@ -57,13 +57,6 @@ namespace AquaBot
         {
             try
             {
-                if (Client != null)
-                {
-                    await Client.StopAsync();
-                    Client.Dispose();
-                    Client = null;
-                }
-
                 Client = new DiscordSocketClient();
                 Client.Log += Log;
                 Client.MessageReceived += MessageReceived;
@@ -73,7 +66,7 @@ namespace AquaBot
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error detected {e.Message} - { e.StackTrace }");
+                Console.WriteLine($"Error detected in NewAquaBot {e.Message} - { e.StackTrace }");
             }
         }
 
