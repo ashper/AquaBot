@@ -49,7 +49,7 @@ namespace AquaBot
             roll = DrinkingRandom.Next(0, Insults.Count);
             var insult = Insults[roll];
 
-            await message.Channel.SendMessageAsync($"Drinky time { user.Username } you {insult}");
+            await message.Channel.SendMessageAsync($"Drinky time { user.Mention } you {insult}");
             await RandomImageHandler.AquaKampai(message, log, false);
         }
 
