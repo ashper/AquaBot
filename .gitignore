@@ -260,5 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 
-
 **/*settings.json
+*settings.json
+/settings.json

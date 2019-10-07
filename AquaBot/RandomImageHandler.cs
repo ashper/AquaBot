@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using System;
 using System.IO;
 using System.Linq;
@@ -11,20 +12,31 @@ namespace AquaBot
         // Random but not so random it's perceived as annoying.
         // Cannot repeat an image while it's running.
 
-        private static string KampaiImageLocation = @"Images\Kampais";
-        private static string AbuseImageLocation = @"Images\Abuses";
+        private static string KampaiImageLocation = $"Images{Path.DirectorySeparatorChar}Kampais";
+        private static string AbuseImageLocation = $"Images{Path.DirectorySeparatorChar}Abuses";
         private static int LastKampai = 999;
         private static int LastAbuse = 999;
 
-        public async static Task AquaKampai(SocketMessage message)
+        public async static Task AquaKampai(SocketMessage message, Func<LogMessage, Task> log, bool sendText)
         {
+            await log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, K A M P A I !"));
+
             var imageResult = PickImage(KampaiImageLocation, LastKampai);
             LastKampai = imageResult.imageIndex;
-            await message.Channel.SendFileAsync(imageResult.imageURI, "K A M P A I !");
+            if (sendText)
+            {
+                await message.Channel.SendFileAsync(imageResult.imageURI, "K A M P A I !");
+            }
+            else
+            {
+                await message.Channel.SendFileAsync(imageResult.imageURI);
+            }
         }
 
-        public async static Task AquaAbuse(SocketMessage message)
+        public async static Task AquaAbuse(SocketMessage message, Func<LogMessage, Task> log)
         {
+            await log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, reacting to abuse"));
+
             var imageResult = PickImage(AbuseImageLocation, LastAbuse);
             LastAbuse = imageResult.imageIndex;
             await message.Channel.SendFileAsync(imageResult.imageURI, "Waaaaaaaaa!");
@@ -35,10 +47,10 @@ namespace AquaBot
             var allImages = new DirectoryInfo(FolderDirectory).GetFiles();
             var imageCount = allImages.Count();
             var rand = new Random();
-            var selectedImage = rand.Next(0, imageCount - 1);
+            var selectedImage = rand.Next(0, imageCount);
             while (selectedImage == lastRandomImage)
             {
-                selectedImage = rand.Next(0, imageCount - 1);
+                selectedImage = rand.Next(0, imageCount);
             }
             return (allImages[selectedImage].FullName, selectedImage);
         }

@@ -10,10 +10,10 @@ namespace AquaBot
     {
         // TODO: A lot of refactoring needed, maybe the boorus should be an interface?
         // TODO: This is a mess >.>
-        private static Safebooru sb = new Safebooru();
 
-        private static Gelbooru gb = new Gelbooru();
-        private static WikipediaClient wiki = new WikipediaClient();
+        private static readonly Safebooru safeBooruImages = new Safebooru();
+        private static readonly Gelbooru gelbooruImages = new Gelbooru();
+        private static readonly WikipediaClient wiki = new WikipediaClient();
         private DiscordSocketClient Client;
 
         private Settings Settings;
@@ -61,7 +61,7 @@ namespace AquaBot
                 Client.Log += Log;
                 Client.MessageReceived += MessageReceived;
 
-                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
+                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.TestingToken);
                 await Client.StartAsync();
             }
             catch (Exception e)
@@ -73,68 +73,75 @@ namespace AquaBot
         // TODO - This feels wrong being in here? Maybe some better way to handle a large if like this?
         private async Task MessageReceived(SocketMessage message)
         {
-            if (message.Author.Id == 267118970094485505 && message.Content == "nice")
+            if (message.Author.IsBot == false)
             {
-                await HandleYuudachiNice(message);
-            }
-            else if (message.Source != MessageSource.Bot)
-            {
-                if (message.Content.ToLower() == "!aqua")
+                if (string.Equals(message.Content, "!aqua", StringComparison.OrdinalIgnoreCase))
                 {
-                    await PostImageSearchAsync(message, "aqua_(konosuba) 1girl", sb);
+                    await PostImageSearchAsync(message, "aqua_(konosuba) 1girl", safeBooruImages);
                 }
-                else if (message.Content.ToLower() == "!megumin")
+                else if (string.Equals(message.Content, "!megumin", StringComparison.OrdinalIgnoreCase))
                 {
-                    await PostImageSearchAsync(message, "megumin 1girl", sb);
+                    await PostImageSearchAsync(message, "megumin 1girl", safeBooruImages);
                 }
-                else if (message.Content.ToLower() == "!darkness")
+                else if (string.Equals(message.Content, "!darkness", StringComparison.OrdinalIgnoreCase))
                 {
-                    await PostImageSearchAsync(message, "darkness_(konosuba) 1girl", sb);
+                    await PostImageSearchAsync(message, "darkness_(konosuba) 1girl", safeBooruImages);
                 }
-                else if (message.Content.ToLower() == "!konosuba")
+                else if (string.Equals(message.Content, "!konosuba", StringComparison.OrdinalIgnoreCase))
                 {
-                    await PostImageSearchAsync(message, "kono_subarashii_sekai_ni_shukufuku_wo! -1girl -1boy", sb);
+                    await PostImageSearchAsync(message, "kono_subarashii_sekai_ni_shukufuku_wo! -1girl -1boy", safeBooruImages);
                 }
-                else if (message.Content.ToLower().IndexOf("!safebooru") >= 0)
+                else if (message.Content.IndexOf("!safebooru", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     await PostSafebooruAsync(message);
                 }
-                else if (message.Content.ToLower().IndexOf("!gelbooru") >= 0)
+                else if (message.Content.IndexOf("!gelbooru", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     await PostGelbooruAsync(message);
                 }
-                else if (message.Content.ToLower() == "!bugmatty")
+                else if (string.Equals(message.Content, "!bugmatty", StringComparison.OrdinalIgnoreCase))
                 {
                     await BugMatty(message);
                 }
-                else if (message.Content.ToLower().IndexOf("!roll") >= 0)
+                else if (message.Content.IndexOf("!roll", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     await RollDX(message);
                 }
-                else if (message.Content.ToLower() == "!flip")
+                else if (string.Equals(message.Content, "!flip", StringComparison.OrdinalIgnoreCase))
                 {
                     await FilpHeadsTails(message);
                 }
-                else if (message.Content.ToLower().Replace(" ", "").IndexOf("kampai") >= 0 && message.Content.Length <= 20)
+                // spaces could be between the letters, k a m p a i, because walp does that
+                else if (message.Content.Replace(" ", "").IndexOf("kampai", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    await RandomImageHandler.AquaKampai(message);
+                    await RandomImageHandler.AquaKampai(message, Log, true);
                 }
-                else if (message.Content.ToLower().IndexOf("aqua") >= 0)
+                else if (message.Content.IndexOf("aqua", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    await AquaAbuseHandler.HandlePotentialAbuse(message);
+                    await AquaAbuseHandler.HandlePotentialAbuse(message, Log);
                 }
-                else if (message.Content.ToLower().IndexOf("!wiki") == 0)
+                else if (message.Content.IndexOf("!wiki", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     await WikiSearch(message);
+                }
+                else if (message.Content.IndexOf("!drinking", StringComparison.OrdinalIgnoreCase) == 0 || message.Content.IndexOf("!drinkers", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    await DrinkingHandler.SetDrinkers(message, Settings, Log);
+                }
+                else if (message.Content.IndexOf("!drink", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    await DrinkingHandler.Drink(message, Settings, Client, Log);
                 }
             }
         }
 
         private async Task WikiSearch(SocketMessage message)
         {
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, searching wikipedia"));
+
             var searchTerm = message.Content.Substring(5).Trim();
             var pageUrl = await wiki.SearchForPage(searchTerm);
-            if (pageUrl == "")
+            if (pageUrl?.Length == 0)
             {
                 await message.Channel.SendMessageAsync("Nothing found.");
             }
@@ -148,51 +155,44 @@ namespace AquaBot
             }
         }
 
-        private async Task HandleYuudachiNice(SocketMessage message)
-        {
-            await Task.Run(async () =>
-            {
-                var sentMessage = await message.Channel.SendMessageAsync("<:amusedaqua:281585444335124493> This is Aqua's server, bad Yuudachi ");
-                await Task.Delay(5000);
-                await message.DeleteAsync();
-                await sentMessage.DeleteAsync();
-            });
-        }
-
         private async Task FilpHeadsTails(SocketMessage message)
         {
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, flipping coin"));
+
             var rnd = new Random();
             var headsOrTails = rnd.Next(2);
 
             if (headsOrTails == 0)
             {
-                await message.Channel.SendMessageAsync("True");
+                await message.Channel.SendMessageAsync("Tails");
             }
             else if (headsOrTails == 1)
             {
-                await message.Channel.SendMessageAsync("False");
+                await message.Channel.SendMessageAsync("Heads");
             }
         }
 
         private async Task RollDX(SocketMessage message)
         {
-            int maxRoll = 0;
-            if (Int32.TryParse(message.Content.ToLower().Replace("!roll", "").Trim(), out maxRoll))
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, rolling dice"));
+
+            int maxRoll = 10;
+
+            if (Int32.TryParse(message.Content.ToLower().Replace("!roll", "").Trim(), out var parsedRoll))
             {
-                var rnd = new Random();
-                var randomRoll = rnd.Next(1, maxRoll);
-                await message.Channel.SendMessageAsync(randomRoll.ToString());
+                maxRoll = parsedRoll;
             }
-            else
-            {
-                await message.Channel.SendMessageAsync("You didn't do it right dummy!");
-            }
+
+            var rnd = new Random();
+            var randomRoll = rnd.Next(1, maxRoll + 1);
+            await message.Channel.SendMessageAsync(randomRoll.ToString());
         }
 
         private async Task PostImageSearchAsync(SocketMessage message, string tags, SearchImage searchingEngine)
         {
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, posting image"));
+
             ImageInfo result = await searchingEngine.SearchRandom(new SearchOption(tags));
-            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, posting image {result.SampleUrl}"));
             if (result == null || string.IsNullOrWhiteSpace(result.SampleUrl))
             {
                 await message.Channel.SendMessageAsync("Hahahaha nothing found, loser");
@@ -205,6 +205,8 @@ namespace AquaBot
 
         private async Task PostGelbooruAsync(SocketMessage message)
         {
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, searching gelbooru"));
+
             if (CheckNFSWChannel(message) == false)
             {
                 await message.Channel.SendMessageAsync("Baka! Hentai! This channel isn't NSFW");
@@ -212,17 +214,21 @@ namespace AquaBot
             }
 
             var tags = $"{message.Content.ToLower().Replace("!gelbooru", "").Trim()} sort:score:desc";
-            await PostImageSearchAsync(message, tags, gb);
+            await PostImageSearchAsync(message, tags, gelbooruImages);
         }
 
         private async Task PostSafebooruAsync(SocketMessage message)
         {
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, searching safebooru"));
+
             var tags = message.Content.ToLower().Replace("!safebooru", "").Trim();
-            await PostImageSearchAsync(message, tags, sb);
+            await PostImageSearchAsync(message, tags, safeBooruImages);
         }
 
         private async Task BugMatty(SocketMessage message)
         {
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, bugging matty"));
+
             var user = Client.GetUser(108696446991085568);
             if (user != null)
             {
@@ -232,9 +238,12 @@ namespace AquaBot
 
         private bool CheckNFSWChannel(SocketMessage message)
         {
-            return message.Channel.IsNsfw;
+            return true;
+            //This has been removed, need to find an alternative, let it through for now.
+            //return message.Channel.IsNsfw;
         }
 
+        // Could move this out to it's own class and also log to a file?
         private Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());

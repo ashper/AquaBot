@@ -9,6 +9,7 @@ namespace AquaBot
     {
         public string TestingToken { get; set; }
         public string LiveToken { get; set; }
+        public ulong[] Drinkers { get; set; }
     }
 
     public class Settings

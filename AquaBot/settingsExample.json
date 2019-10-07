@@ -1,5 +1,6 @@
 {
   // Bot tokens from https://discordapp.com/developers/applications/
   "TestingToken": "123",
-  "LiveToken": "123"
+  "LiveToken": "123",
+  "Drinkers": []
 }
