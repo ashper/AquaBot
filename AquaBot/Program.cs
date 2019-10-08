@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -103,10 +104,6 @@ namespace AquaBot
                 {
                     await BugMatty(message);
                 }
-                else if (message.Content.IndexOf("!roll", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    await RollDX(message);
-                }
                 else if (string.Equals(message.Content, "!flip", StringComparison.OrdinalIgnoreCase))
                 {
                     await FilpHeadsTails(message);
@@ -131,6 +128,10 @@ namespace AquaBot
                 else if (message.Content.IndexOf("!drink", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     await DrinkingHandler.Drink(message, Settings, Client, Log);
+                }
+                else if (message.Content.IndexOf("!d", StringComparison.OrdinalIgnoreCase) == 0 && Regex.Match(message.Content.ToLower().Replace(" ", ""), @"!d\d+").Success)
+                {
+                    await RollDX(message);
                 }
             }
         }
@@ -176,16 +177,12 @@ namespace AquaBot
         {
             await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, rolling dice"));
 
-            int maxRoll = 10;
-
-            if (Int32.TryParse(message.Content.ToLower().Replace("!roll", "").Trim(), out var parsedRoll))
+            if (Int32.TryParse(message.Content.Replace(" ", "").ToLower().Replace("!d", "").Trim(), out var parsedRoll))
             {
-                maxRoll = parsedRoll;
+                var rnd = new Random();
+                var randomRoll = rnd.Next(1, parsedRoll + 1);
+                await message.Channel.SendMessageAsync(randomRoll.ToString());
             }
-
-            var rnd = new Random();
-            var randomRoll = rnd.Next(1, maxRoll + 1);
-            await message.Channel.SendMessageAsync(randomRoll.ToString());
         }
 
         private async Task PostImageSearchAsync(SocketMessage message, string tags, SearchImage searchingEngine)

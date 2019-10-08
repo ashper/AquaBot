@@ -14,7 +14,7 @@ namespace AquaBot
         {
             "sucks","isshit","crap","useless","uselessgoddess",
             "trash","ashit","thot","fuck","slag","whore","shit",
-            "pointless","waste","poopoo","idiot","stinky"
+            "pointless","waste","poopoo","idiot","stinky", "stupid"
         };
 
         // At this point we know the message contains the text Aqua, lets see if we can find any other text from our abuse list
