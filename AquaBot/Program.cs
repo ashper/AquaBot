@@ -133,6 +133,10 @@ namespace AquaBot
                 {
                     await RollDX(message);
                 }
+                else if (message.Content.Replace("!", "").Contains(Client.CurrentUser.Mention.Replace("!", "")) && message.Content.LastIndexOf('?') == message.Content.Length - 1)
+                {
+                    await Magic8Ball.Answer(message, Log);
+                }
             }
         }
 
