@@ -15,6 +15,7 @@ namespace AquaBot
         private static readonly Safebooru safeBooruImages = new Safebooru();
         private static readonly Gelbooru gelbooruImages = new Gelbooru();
         private static readonly WikipediaClient wiki = new WikipediaClient();
+        private static Random rnd = new Random();
         private DiscordSocketClient Client;
 
         private Settings Settings;
@@ -133,10 +134,42 @@ namespace AquaBot
                 {
                     await RollDX(message);
                 }
-                else if (message.Content.Replace("!", "").Contains(Client.CurrentUser.Mention.Replace("!", "")) && message.Content.LastIndexOf('?') == message.Content.Length - 1)
+                else if (message.Content.IndexOf("!tuck", StringComparison.OrdinalIgnoreCase) == 0 && message.MentionedUsers.Count > 0)
                 {
-                    await Magic8Ball.Answer(message, Log);
+                    await Tuck(message);
                 }
+                else if (message.Content.Replace("!", "").Contains(Client.CurrentUser.Mention.Replace("!", "")))
+                {
+                    if (message.Content.IndexOf("or", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        await MakeDecision(message);
+                    }
+                    else if (message.Content.LastIndexOf('?') == message.Content.Length - 1)
+                    {
+                        await Magic8Ball.Answer(message, Log);
+                    }
+                }
+            }
+        }
+
+        private async Task MakeDecision(SocketMessage message)
+        {
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, making a choice"));
+
+            var cleanedMessage = message.Content.Replace(Client.CurrentUser.Mention, "").Replace(Client.CurrentUser.Mention.Replace("!", ""), "");
+            var splitOrs = cleanedMessage.ToLower().Split("or", StringSplitOptions.RemoveEmptyEntries);
+            var choiceIndex = rnd.Next(0, splitOrs.Length);
+            var choice = splitOrs[choiceIndex];
+
+            await message.Channel.SendMessageAsync(choice);
+        }
+
+        private async Task Tuck(SocketMessage message)
+        {
+            await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, tucking people in"));
+            foreach (var user in message.MentionedUsers)
+            {
+                await message.Channel.SendMessageAsync($"Tucking { user.Mention } into bed :point_right: :bed:, night night!");
             }
         }
 
