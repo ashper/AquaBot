@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace AquaBot
@@ -10,6 +11,7 @@ namespace AquaBot
         public string TestingToken { get; set; }
         public string LiveToken { get; set; }
         public ulong[] Drinkers { get; set; }
+        public List<string> BannedWords { get; set; }
     }
 
     public class Settings

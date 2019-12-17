@@ -44,7 +44,7 @@ namespace AquaBot
         {
             try
             {
-                if (Client == null || Client.ConnectionState != ConnectionState.Connected)
+                if (Client == null)
                 {
                     await NewAquaBot();
                 }
@@ -77,6 +77,14 @@ namespace AquaBot
         {
             if (message.Author.IsBot == false)
             {
+                if (message.Content.IndexOf("!addBannedWord", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                   await BannedWords.AddBannedWord(message, message.Content.Replace("!addBannedWord", "", StringComparison.OrdinalIgnoreCase).Trim(), Settings);
+                }
+                else if (BannedWords.CheckMessage(message, Settings.CurrentSettings.BannedWords))
+                {
+                    await BannedWords.HandleUseOfBannedWords(Settings.CurrentSettings.BannedWords, message);
+                }
                 if (string.Equals(message.Content, "!aqua", StringComparison.OrdinalIgnoreCase))
                 {
                     await PostImageSearchAsync(message, "aqua_(konosuba) 1girl", safeBooruImages);
