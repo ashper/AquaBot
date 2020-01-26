@@ -63,7 +63,7 @@ namespace AquaBot
                 Client.Log += Log;
                 Client.MessageReceived += MessageReceived;
 
-                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.TestingToken);
+                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
                 await Client.StartAsync();
             }
             catch (Exception e)
@@ -148,7 +148,7 @@ namespace AquaBot
                 }
                 else if (message.Content.Replace("!", "").Contains(Client.CurrentUser.Mention.Replace("!", "")))
                 {
-                    if (message.Content.IndexOf("or", StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (message.Content.IndexOf(" or ", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         await MakeDecision(message);
                     }

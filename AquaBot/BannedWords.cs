@@ -7,6 +7,8 @@ namespace AquaBot
 {
     public static class BannedWords
     {
+        private static List<string> CharsToRemove = new List<string>() { "|", "*", "_" };
+
         public static Task AddBannedWord(SocketMessage message, string word, Settings settings)
         {
             if (!settings.CurrentSettings.BannedWords.Contains(word.ToLower()))
@@ -20,9 +22,11 @@ namespace AquaBot
 
         public static bool CheckMessage(SocketMessage message, List<string> bannedWords)
         {
+            var cleanedMessage = message.Content.RemoveStrings(CharsToRemove);
+
             foreach (var word in bannedWords)
             {
-                if (message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))
+                if (cleanedMessage.Contains(word, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -34,17 +38,26 @@ namespace AquaBot
         {
             Console.WriteLine("Banned word detected, fixing");
 
-            var cleanedMessage = message.Content;
+            var cleanedMessage = message.Content.RemoveStrings(CharsToRemove);
 
             foreach (var word in bannedWords)
             {
-               cleanedMessage = cleanedMessage.Replace(word, "water", StringComparison.OrdinalIgnoreCase);
+                cleanedMessage = cleanedMessage.Replace(word, "water", StringComparison.OrdinalIgnoreCase);
             }
 
             message.DeleteAsync();
             return message.Channel.SendFileAsync("Images/Purification.gif",
                 $@"{message.Author.Mention} Purification! Purification! Purification! `{cleanedMessage}`"
                 );
+        }
+
+        private static string RemoveStrings(this string input, List<string> CharsToRemove)
+        {
+            foreach (var c in CharsToRemove)
+            {
+                input = input.Replace(c, "");
+            }
+            return input;
         }
     }
 }
