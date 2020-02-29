@@ -165,7 +165,7 @@ namespace AquaBot
             await Log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, making a choice"));
 
             var cleanedMessage = message.Content.Replace(Client.CurrentUser.Mention, "").Replace(Client.CurrentUser.Mention.Replace("!", ""), "");
-            var splitOrs = cleanedMessage.ToLower().Split("or", StringSplitOptions.RemoveEmptyEntries);
+            var splitOrs = cleanedMessage.ToLower().Split(" or ", StringSplitOptions.RemoveEmptyEntries);
             var choiceIndex = rnd.Next(0, splitOrs.Length);
             var choice = splitOrs[choiceIndex];
 
