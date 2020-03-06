@@ -34,28 +34,28 @@
     <None Update="Images\Abuses\6.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Kampais\1.jpg">
+    <None Update="Images\Kanpais\1.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Kampais\2.jpg">
+    <None Update="Images\Kanpais\2.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Kampais\3.gif">
+    <None Update="Images\Kanpais\3.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Kampais\4.jpg">
+    <None Update="Images\Kanpais\4.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Kampais\5.gif">
+    <None Update="Images\Kanpais\5.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Kampais\6.jpg">
+    <None Update="Images\Kanpais\6.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Kampais\7.gif">
+    <None Update="Images\Kanpais\7.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\Kampais\8.gif">
+    <None Update="Images\Kanpais\8.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\Purification.gif">

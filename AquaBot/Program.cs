@@ -118,9 +118,9 @@ namespace AquaBot
                     await FilpHeadsTails(message);
                 }
                 // spaces could be between the letters, k a m p a i, because walp does that
-                else if (message.Content.Replace(" ", "").IndexOf("kampai", StringComparison.OrdinalIgnoreCase) >= 0)
+                else if (message.Content.Replace(" ", "").IndexOf("kanpai", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    await RandomImageHandler.AquaKampai(message, Log, true);
+                    await RandomImageHandler.AquaKanpai(message, Log, true);
                 }
                 else if (message.Content.IndexOf("aqua", StringComparison.OrdinalIgnoreCase) >= 0)
                 {

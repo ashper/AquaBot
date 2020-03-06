@@ -50,7 +50,7 @@ namespace AquaBot
             var insult = Insults[roll];
 
             await message.Channel.SendMessageAsync($"Drinky time { user.Mention } you {insult}");
-            await RandomImageHandler.AquaKampai(message, log, false);
+            await RandomImageHandler.AquaKanpai(message, log, false);
         }
 
         private static readonly List<string> Insults = new List<string>()

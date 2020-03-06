@@ -12,20 +12,20 @@ namespace AquaBot
         // Random but not so random it's perceived as annoying.
         // Cannot repeat an image while it's running.
 
-        private static string KampaiImageLocation = $"Images{Path.DirectorySeparatorChar}Kampais";
+        private static string KanpaiImageLocation = $"Images{Path.DirectorySeparatorChar}Kanpais";
         private static string AbuseImageLocation = $"Images{Path.DirectorySeparatorChar}Abuses";
-        private static int LastKampai = 999;
+        private static int LastKanpai = 999;
         private static int LastAbuse = 999;
 
-        public async static Task AquaKampai(SocketMessage message, Func<LogMessage, Task> log, bool sendText)
+        public async static Task AquaKanpai(SocketMessage message, Func<LogMessage, Task> log, bool sendText)
         {
-            await log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, K A M P A I !"));
+            await log(new LogMessage(LogSeverity.Info, "Discord", $"{message.Content.ToLower()} detected, K A N P A I !"));
 
-            var imageResult = PickImage(KampaiImageLocation, LastKampai);
-            LastKampai = imageResult.imageIndex;
+            var imageResult = PickImage(KanpaiImageLocation, LastKanpai);
+            LastKanpai = imageResult.imageIndex;
             if (sendText)
             {
-                await message.Channel.SendFileAsync(imageResult.imageURI, "K A M P A I !");
+                await message.Channel.SendFileAsync(imageResult.imageURI, "K A N P A I !");
             }
             else
             {
