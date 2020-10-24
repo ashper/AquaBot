@@ -12,6 +12,16 @@ namespace AquaBot
         public string LiveToken { get; set; }
         public ulong[] Drinkers { get; set; }
         public List<string> BannedWords { get; set; }
+        public Dictionary<DayOfWeek, DayMessage> DayMessages { get; set; }
+        public DateTime DayMessageLastRun { get; set; }
+        public ulong DayMessageChannel { get; set; }
+    }
+
+    [Serializable]
+    public class DayMessage
+    {
+        public string ImageLink { get; set; }
+        public string Message { get; set; }
     }
 
     public class Settings
@@ -21,18 +31,25 @@ namespace AquaBot
 
         public void LoadSettings()
         {
-            if (File.Exists(SettingFileName))
+            if (CurrentSettings == null)
             {
-                using (StreamReader re = File.OpenText(SettingFileName))
+                if (File.Exists(SettingFileName))
                 {
-                    JsonSerializer se = new JsonSerializer();
-                    JsonTextReader reader = new JsonTextReader(re);
-                    CurrentSettings = se.Deserialize<BotSettings>(reader);
+                    using (StreamReader re = File.OpenText(SettingFileName))
+                    {
+                        JsonSerializer se = new JsonSerializer();
+                        JsonTextReader reader = new JsonTextReader(re);
+                        CurrentSettings = se.Deserialize<BotSettings>(reader);
+                    }
                 }
-            }
-            else
-            {
-                CurrentSettings = new BotSettings();
+                else
+                {
+                    CurrentSettings = new BotSettings();
+                }
+                if (CurrentSettings.DayMessages == null)
+                {
+                    CurrentSettings.DayMessages = new Dictionary<DayOfWeek, DayMessage>();
+                }
             }
         }
 

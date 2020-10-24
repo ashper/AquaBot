@@ -11,11 +11,13 @@ namespace AquaBot
     {
         // TODO: A lot of refactoring needed, maybe the boorus should be an interface?
         // TODO: This is a mess >.>
+        // TODO: Yeah never cleaning this up, forget it
 
         private static readonly Safebooru safeBooruImages = new Safebooru();
         private static readonly Gelbooru gelbooruImages = new Gelbooru();
         private static readonly WikipediaClient wiki = new WikipediaClient();
-        private static Random rnd = new Random();
+        private static readonly Random rnd = new Random();
+        private readonly int TenMinutesAsMilliseconds = 6000;
         private DiscordSocketClient Client;
 
         private Settings Settings;
@@ -34,20 +36,19 @@ namespace AquaBot
             Settings = new Settings();
             Settings.LoadSettings();
 
+            await NewAquaBot();
+
             autoEvent = new AutoResetEvent(false);
-            tm = new Timer(Execute, autoEvent, 0, 600000);
+            tm = new Timer(async x => await Execute(x), autoEvent, 0, TenMinutesAsMilliseconds);
 
             await Task.Delay(-1);
         }
 
-        public async void Execute(Object stateInfo)
+        public async Task Execute(Object stateInfo)
         {
             try
             {
-                if (Client == null)
-                {
-                    await NewAquaBot();
-                }
+                await DayMessageCommand.CheckAndRun(Client, Settings);
             }
             catch (Exception e)
             {
@@ -63,7 +64,7 @@ namespace AquaBot
                 Client.Log += Log;
                 Client.MessageReceived += MessageReceived;
 
-                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
+                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.TestingToken);
                 await Client.StartAsync();
             }
             catch (Exception e)
@@ -79,7 +80,7 @@ namespace AquaBot
             {
                 if (message.Content.IndexOf("!addBannedWord", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                   await BannedWords.AddBannedWord(message, message.Content.Replace("!addBannedWord", "", StringComparison.OrdinalIgnoreCase).Trim(), Settings);
+                    await BannedWords.AddBannedWord(message, message.Content.Replace("!addBannedWord", "", StringComparison.OrdinalIgnoreCase).Trim(), Settings);
                 }
                 else if (BannedWords.CheckMessage(message, Settings.CurrentSettings.BannedWords))
                 {
@@ -145,6 +146,10 @@ namespace AquaBot
                 else if (message.Content.IndexOf("!tuck", StringComparison.OrdinalIgnoreCase) == 0 && message.MentionedUsers.Count > 0)
                 {
                     await Tuck(message);
+                }
+                else if (message.Content.IndexOf("!daymessage", StringComparison.OrdinalIgnoreCase) == 0 || message.Content.IndexOf("!daym", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    await DayMessageCommand.Handle(Client, message, Settings);
                 }
                 else if (message.Content.Replace("!", "").Contains(Client.CurrentUser.Mention.Replace("!", "")))
                 {
