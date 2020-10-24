@@ -14,7 +14,7 @@ namespace AquaBot
             settings.LoadSettings();
 
             // Only run between 5pm and midnight
-            if (DateTime.Now.Hour > 13 && DateTime.Now.Hour <= 24)
+            if (DateTime.Now.Hour > 17 && DateTime.Now.Hour <= 24)
             {
                 if (settings.CurrentSettings.DayMessageLastRun == null || (DateTime.Now - settings.CurrentSettings.DayMessageLastRun).TotalHours > 18)
                 {
@@ -169,7 +169,7 @@ namespace AquaBot
             {
                 if (controller(str[c]))
                 {
-                    yield return str.Substring(nextPiece, c - nextPiece);
+                    yield return str[nextPiece..c];
                     nextPiece = c + 1;
                 }
             }

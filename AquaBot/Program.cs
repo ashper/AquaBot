@@ -17,7 +17,7 @@ namespace AquaBot
         private static readonly Gelbooru gelbooruImages = new Gelbooru();
         private static readonly WikipediaClient wiki = new WikipediaClient();
         private static readonly Random rnd = new Random();
-        private readonly int TenMinutesAsMilliseconds = 6000;
+        private readonly int TenMinutesAsMilliseconds = 600000;
         private DiscordSocketClient Client;
 
         private Settings Settings;
