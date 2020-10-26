@@ -14,7 +14,7 @@ namespace AquaBot
             settings.LoadSettings();
 
             // Only run between 5pm and midnight
-            if (DateTime.Now.Hour > 17 && DateTime.Now.Hour <= 24)
+            if (DateTime.Now.Hour >= 17 && DateTime.Now.Hour <= 24)
             {
                 if (settings.CurrentSettings.DayMessageLastRun == null || (DateTime.Now - settings.CurrentSettings.DayMessageLastRun).TotalHours > 18)
                 {
@@ -22,14 +22,32 @@ namespace AquaBot
                     {
                         if (client.GetChannel(settings.CurrentSettings.DayMessageChannel) is IMessageChannel mainChannel)
                         {
+                            Console.WriteLine("Day message found, sending");
+
                             await mainChannel.SendMessageAsync("**" + day.Message + "**");
                             await mainChannel.SendMessageAsync(day.ImageLink);
 
                             settings.CurrentSettings.DayMessageLastRun = DateTime.Now;
                             settings.SaveSettings();
                         }
+                        else
+                        {
+                            Console.WriteLine("No day message channel found, stopping check");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No day message found, stopping check");
                     }
                 }
+                else
+                {
+                    Console.WriteLine("Day message previously run, stopping check");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"DateTime.Now.Hour = { DateTime.Now.Hour }, not time to run");
             }
         }
 

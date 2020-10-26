@@ -18,6 +18,7 @@ namespace AquaBot
         private static readonly WikipediaClient wiki = new WikipediaClient();
         private static readonly Random rnd = new Random();
         private readonly int TenMinutesAsMilliseconds = 600000;
+        private readonly int OneMinutesAsMilliseconds = 60000;
         private DiscordSocketClient Client;
 
         private Settings Settings;
@@ -48,6 +49,7 @@ namespace AquaBot
         {
             try
             {
+                Console.WriteLine("Day message timer Execute");
                 await DayMessageCommand.CheckAndRun(Client, Settings);
             }
             catch (Exception e)
