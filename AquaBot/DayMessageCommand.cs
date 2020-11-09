@@ -13,8 +13,8 @@ namespace AquaBot
         {
             settings.LoadSettings();
 
-            // Only run between 5pm and midnight
-            if (DateTime.Now.Hour >= 17 && DateTime.Now.Hour <= 24)
+            // Only run between 9am and midnight
+            if (DateTime.Now.Hour >= 09 && DateTime.Now.Hour <= 24)
             {
                 if (settings.CurrentSettings.DayMessageLastRun == null || (DateTime.Now - settings.CurrentSettings.DayMessageLastRun).TotalHours > 18)
                 {
