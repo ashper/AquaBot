@@ -12,8 +12,7 @@ namespace AquaBot
         public string LiveToken { get; set; }
         public ulong[] Drinkers { get; set; }
         public List<string> BannedWords { get; set; }
-        public Dictionary<DayOfWeek, DayMessage> DayMessages { get; set; }
-        public DateTime DayMessageLastRun { get; set; }
+        public List<DayMessage> DayMessages { get; set; }
         public ulong DayMessageChannel { get; set; }
     }
 
@@ -22,6 +21,9 @@ namespace AquaBot
     {
         public string ImageLink { get; set; }
         public string Message { get; set; }
+        public DateTime LastRun { get; set; }
+        public DayOfWeek Day { get; set; }
+        public bool MorningMessage { get; set; }
     }
 
     public class Settings
@@ -48,7 +50,7 @@ namespace AquaBot
                 }
                 if (CurrentSettings.DayMessages == null)
                 {
-                    CurrentSettings.DayMessages = new Dictionary<DayOfWeek, DayMessage>();
+                    CurrentSettings.DayMessages = new List<DayMessage>();
                 }
             }
         }

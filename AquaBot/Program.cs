@@ -18,12 +18,11 @@ namespace AquaBot
         private static readonly WikipediaClient wiki = new WikipediaClient();
         private static readonly Random rnd = new Random();
         private readonly int TenMinutesAsMilliseconds = 600000;
-        private readonly int OneMinutesAsMilliseconds = 60000;
         private DiscordSocketClient Client;
 
         private Settings Settings;
 
-        private Timer tm = null;
+        private Timer tmAM = null;
 
         private AutoResetEvent autoEvent = null;
 
@@ -40,7 +39,7 @@ namespace AquaBot
             await NewAquaBot();
 
             autoEvent = new AutoResetEvent(false);
-            tm = new Timer(async x => await Execute(x), autoEvent, 0, TenMinutesAsMilliseconds);
+            tmAM = new Timer(async x => await Execute(x), autoEvent, 0, TenMinutesAsMilliseconds);
 
             await Task.Delay(-1);
         }
@@ -66,7 +65,7 @@ namespace AquaBot
                 Client.Log += Log;
                 Client.MessageReceived += MessageReceived;
 
-                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.TestingToken);
+                await Client.LoginAsync(TokenType.Bot, Settings.CurrentSettings.LiveToken);
                 await Client.StartAsync();
             }
             catch (Exception e)
@@ -120,7 +119,7 @@ namespace AquaBot
                 {
                     await FilpHeadsTails(message);
                 }
-                // spaces could be between the letters, k a m p a i, because walp does that
+                // spaces could be between the letters, k a m p a i, because josh does that
                 else if (message.Content.Replace(" ", "").IndexOf("kanpai", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     await RandomImageHandler.AquaKanpai(message, Log, true);
@@ -148,10 +147,6 @@ namespace AquaBot
                 else if (message.Content.IndexOf("!tuck", StringComparison.OrdinalIgnoreCase) == 0 && message.MentionedUsers.Count > 0)
                 {
                     await Tuck(message);
-                }
-                else if (message.Content.IndexOf("!daymessage", StringComparison.OrdinalIgnoreCase) == 0 || message.Content.IndexOf("!daym", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    await DayMessageCommand.Handle(Client, message, Settings);
                 }
                 else if (message.Content.Replace("!", "").Contains(Client.CurrentUser.Mention.Replace("!", "")))
                 {
